@@ -30,72 +30,6 @@
         var correctscore = 0;
         var incorrectscore = 0;
         var unanswered = 0;
-        var playingarray = [];
-
-        //create objects or array's containing the questions and anwnsers
-
-
-        var question1 = {
-            questiontext: "Which one of the following foods were introduced to America from Europe?",
-            correcttext: "The White Potato was introduced.",
-            correct: "the white potato.",
-            answers: ["the white potato", "the pumpkin", "the mango", "the pineapple"]
-        }
-        var question2 = {
-            questiontext: "More than 75% of the world's supply of maple syrup comes from where?",
-            correcttext: "Canada supplies over 75% of the world's maple syrup.",
-            correct: "Canada",
-            answers: ["France", "New York", "Canada", "Minnesota"]
-        }
-        var question3 = {
-            questiontext: "What is Bombay Duck?",
-            correcttext: "The Bombay Duck is fish.",
-            correct: "Fish",
-            answers: ["Curried Chicken", "Fish", "Indian Pancake", "Vegeterian Stew"]
-        }
-        var question4 = {
-            questiontext: "In what country might you find maguro on the menu?",
-            correcttext: "Maguro is the Japanese word for a kind of tuna that is popular in sushi restaurants.",
-            correct: "Japan",
-            answers: ["Japan", "Korea", "India", "China"]
-        }
-        var question5 = {
-            questiontext: "What is the basic ingredient of curry?",
-            correcttext: "The basic ingredients of commercial curry powder are turmeric (which imparts the characteristic yellow color), cumin, coriander, and cayenne pepper.",
-            correct: "Turmeric",
-            answers: ["Sugar", "Turmeric", "Cinnamon", "Celery Salt"]
-        }
-        var question6 = {
-            questiontext: "Which kind of tree does the spice called mace come from?",
-            correcttext: "Mace is the ground exterior of the nutmeg seed.",
-            correct: "Nutmeg",
-            answers: ["Walnut", "Oak", "Banana", "Nutmeg"]
-        }
-        var question7 = {
-            questiontext: "What is table sugar?",
-            correcttext: "Sucrose is another word for table sugar.",
-            correct: "Sucrose",
-            answers: ["Fructose", "Glucose", "Otiose", "Sucrose"]
-        }
-        var question8 = {
-            questiontext: "In 1925, how many restaurants were in New York City?",
-            correcttext: "New Yorker had 17,000 restaurants to choose from",
-            correct: "17,000",
-            answers: ["7,000", "700", "27,000", "17,000"]
-        }
-        var question9 = {
-            questiontext: "Which of the following dishes were born in Italy?",
-            correcttext: "none of them",
-            correct: "none of them",
-            answers: ["Caesar Salad", "Fettucine Primavera", "Chicken Tetrazzini", "none of them"]
-        }
-        var question10 = {
-            questiontext: "In the dish of Beef Wellington, in what is the beef wrapped?",
-            correcttext: "The beef is wrapped in Pastry",
-            correct: "Pastry",
-            answers: ["batter", "bread", "lasagne sheets", "pastry"]
-        }
-        var playquestions = [question1, question2, question3, question4, question5, question6, question7, question8, question9, question10];
 
 
 
@@ -107,12 +41,9 @@
 
         //
 
-
-
-
-
-
-
+        function clearScreen() {
+            $("main").empty();
+        }
 
 
         $(document).ready(function () {
@@ -120,32 +51,34 @@
             var currentanswers = [];
             var correctanswer = "";
 
-            $.get("https://opentdb.com/api.php?amount=1&category=12&difficulty=medium&type=multiple", function (data, status) {
-                for (var i = 0; i < data.results[0].incorrect_answers.length; i++) {
-                    currentanswers.push(data.results[0].incorrect_answers[i])
-                }
-                currentquestion = data.results[0].question;
-                correctanswer = data.results[0].correct_answer;
-                currentanswers.push(data.results[0].correct_answer)
-                currentanswers.sort(function () { return 0.5 - Math.random() });
-                console.log(currentanswers);
-
-            });
-
-
-            function getGameReady() {
-                $("main").empty();
-                playingarray = [];
-                for (; playingarray.length < 7;) {
-                    var randomnumber = Math.floor((Math.random() * playquestions.length));
-                    if (playingarray.includes(playquestions[randomnumber]) === false) {
-                        playingarray.push(playquestions[randomnumber])
+            function getNewQuestion() {
+                $.get("https://opentdb.com/api.php?amount=1&category=12&difficulty=medium&type=multiple", function (data, status) {
+                    for (var i = 0; i < data.results[0].incorrect_answers.length; i++) {
+                        currentanswers.push(data.results[0].incorrect_answers[i])
                     }
-                }
+                    currentquestion = data.results[0].question;
+                    correctanswer = data.results[0].correct_answer;
+                    currentanswers.push(data.results[0].correct_answer)
+                    currentanswers.sort(function () { return 0.5 - Math.random() });
+                    console.log(currentanswers);
+
+                });
+
+            }
+
+
+
+
+            function getGameStart() {
+                getNewQuestion();
+                clearScreen();
                 $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>welcome to the Trivia Game.  Click start to begin</h1></div>")
                 $("main").append("<div class='jumbotron text-center'><button id='startgamebutton' type='button' class='btn btn-lg btn-block btn-primary'>Start!</button></div>")
-                $("#startgamebutton").click(function () {
-                    $("main").empty();
+            }
+            getGameStart();
+
+            $("#startgamebutton").click(function () {
+                    clearScreen();
                     var intervalId;
                     var number = 30;
                     function run() {
@@ -165,7 +98,7 @@
                         if (number === 0) {
 
                             stop();
-                            $("main").empty();
+                            clearScreen();
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Times Up!, The Correct Answer Was: " + correctanswer + "</h1></div>")
                         }
@@ -179,20 +112,19 @@
                     }
                     $(".ansbutton").click(function () {
                         stop();
-                        $("main").empty();
+                        clearScreen();
                         $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
                         buttonpressed = $(this).attr("id")
 
                         if (buttonpressed === correctanswer) {
                             console.log("CORRECT!")
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Correct!, The Correct Answer Was: " + correctanswer + "</h1></div>")
-                            
                         }
                         else {
                             console.log("WRONG!")
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Incorrect!, The Correct Answer Was: " + correctanswer + "</h1></div>")
                         }
-                        
+
 
                     });
 
@@ -206,8 +138,7 @@
 
 
 
-            }
-            getGameReady()
+            
 
 
 
