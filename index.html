@@ -116,12 +116,16 @@
 
 
         $(document).ready(function () {
+            var currentquestion = "";
             var currentanswers = [];
+            var correctanswer = "";
 
             $.get("https://opentdb.com/api.php?amount=1&category=12&difficulty=medium&type=multiple", function (data, status) {
                 for (var i = 0; i < data.results[0].incorrect_answers.length; i++) {
                     currentanswers.push(data.results[0].incorrect_answers[i])
                 }
+                currentquestion = data.results[0].question;
+                correctanswer = data.results[0].correct_answer;
                 currentanswers.push(data.results[0].correct_answer)
                 currentanswers.sort(function () { return 0.5 - Math.random() });
                 console.log(currentanswers);
@@ -140,29 +144,61 @@
                 }
                 $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>welcome to the Trivia Game.  Click start to begin</h1></div>")
                 $("main").append("<div class='jumbotron text-center'><button id='startgamebutton' type='button' class='btn btn-lg btn-block btn-primary'>Start!</button></div>")
-                $("#startgamebutton").click(function() {
+                $("#startgamebutton").click(function () {
                     $("main").empty();
                     var intervalId;
                     var number = 30;
                     function run() {
                         intervalId = setInterval(decrement, 1000);
                     }
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
+                    for (let i = 0; i < currentanswers.length; i++) {
+                        $("main").append("<div class='ansbutton jumbotron text-center'><button id='" + currentanswers[i] + "' type='button' class='ansbutton btn btn-lg btn-block btn-primary'>" + currentanswers[i] + "</button></div>")
+                    }
+
                     function decrement() {
 
-                    number--;
-                    
-                    $("#show-number").html("<h2>" + number + "</h2>");
-                    
-                    if (number === 0) {
-                    
-                      stop();
-                    
-                      alert("Time Up!");
+                        number--;
+
+                        $("#show-number").html("<h2>" + number + "</h2>");
+
+                        if (number === 0) {
+
+                            stop();
+                            $("main").empty();
+                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
+                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Times Up!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                        }
                     }
+                    run();
+                    function stop() {
+
+
+                        clearInterval(intervalId);
+
                     }
-                    
-                    
-                                    });
+                    $(".ansbutton").click(function () {
+                        stop();
+                        $("main").empty();
+                        $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
+                        buttonpressed = $(this).attr("id")
+
+                        if (buttonpressed === correctanswer) {
+                            console.log("CORRECT!")
+                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Correct!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                            
+                        }
+                        else {
+                            console.log("WRONG!")
+                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Incorrect!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                        }
+                        
+
+                    });
+
+
+
+                });
 
 
 
