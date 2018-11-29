@@ -16,7 +16,7 @@
         crossorigin="anonymous"></script>
 
 
-    <title>Food Triva game</title>
+    <title>Music Triva game</title>
 </head>
 
 <body>
@@ -27,30 +27,31 @@
     </main>
     <script>
 
-        var correctscore = 0;
-        var incorrectscore = 0;
-        var unanswered = 0;
 
-
-
-        //stage initial questions by setting set of questions and by setting anwersers 
-
-        //start the initial timer with the first question chosen randomly
-
-        //determine number of questions nad set the game field with how many questions thereare
-
-        //
-
-        function clearScreen() {
-            $("main").empty();
-        }
 
 
         $(document).ready(function () {
+            var correctscore = 0;
+            var incorrectscore = 0;
+            var unanswered = 0;
+            var playnumber = 0;
             var currentquestion = "";
             var currentanswers = [];
             var correctanswer = "";
+            var intervalId;
+            var number = 4;
 
+
+
+            //stage initial questions by setting set of questions and by setting anwersers 
+
+            //start the initial timer with the first question chosen randomly
+
+            //determine number of questions nad set the game field with how many questions thereare
+
+            function clearScreen() {
+                $("main").empty();
+            }
             function getNewQuestion() {
                 $.get("https://opentdb.com/api.php?amount=1&category=12&difficulty=medium&type=multiple", function (data, status) {
                     for (var i = 0; i < data.results[0].incorrect_answers.length; i++) {
@@ -60,55 +61,9 @@
                     correctanswer = data.results[0].correct_answer;
                     currentanswers.push(data.results[0].correct_answer)
                     currentanswers.sort(function () { return 0.5 - Math.random() });
-                    console.log(currentanswers);
-
-                });
-
-            }
-
-
-
-
-            function getGameStart() {
-                getNewQuestion();
-                clearScreen();
-                $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>welcome to the Trivia Game.  Click start to begin</h1></div>")
-                $("main").append("<div class='jumbotron text-center'><button id='startgamebutton' type='button' class='btn btn-lg btn-block btn-primary'>Start!</button></div>")
-            }
-            getGameStart();
-
-            $("#startgamebutton").click(function () {
-                    clearScreen();
-                    var intervalId;
-                    var number = 30;
-                    function run() {
-                        intervalId = setInterval(decrement, 1000);
-                    }
                     $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
                     for (let i = 0; i < currentanswers.length; i++) {
                         $("main").append("<div class='ansbutton jumbotron text-center'><button id='" + currentanswers[i] + "' type='button' class='ansbutton btn btn-lg btn-block btn-primary'>" + currentanswers[i] + "</button></div>")
-                    }
-
-                    function decrement() {
-
-                        number--;
-
-                        $("#show-number").html("<h2>" + number + "</h2>");
-
-                        if (number === 0) {
-
-                            stop();
-                            clearScreen();
-                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
-                            $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Times Up!, The Correct Answer Was: " + correctanswer + "</h1></div>")
-                        }
-                    }
-                    run();
-                    function stop() {
-
-
-                        clearInterval(intervalId);
-
                     }
                     $(".ansbutton").click(function () {
                         stop();
@@ -117,28 +72,105 @@
                         buttonpressed = $(this).attr("id")
 
                         if (buttonpressed === correctanswer) {
-                            console.log("CORRECT!")
+                            correctscore++
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Correct!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                            playnumber++
+                            windowTimeout = setTimeout(function () {
+                                runGame()
+                            }, 3000);
+
                         }
                         else {
-                            console.log("WRONG!")
+                            incorrectscore++
                             $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>You are Incorrect!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                            playnumber++
+                            var windowTimeout = setTimeout(function () {
+                                runGame()
+                            }, 3000);
+
                         }
-
-
                     });
-
 
 
                 });
 
+            }
+            function getGameStart() {
+                clearScreen();
+                $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>welcome to the Trivia Game.  Click start to begin</h1></div>")
+                $("main").append("<div class='jumbotron text-center'><button id='startgamebutton' type='button' class='btn btn-lg btn-block btn-primary'>Start!</button></div>")
+            }
+            function run() {
+                intervalId = setInterval(decrement, 1000);
+            }
+            function stop() {
+
+                clearInterval(intervalId);
+
+            }
+            function decrement() {
+
+                number--;
+
+                $("#show-number").html("<h2>" + number + "</h2>");
+
+                if (number === 0) {
+
+                    stop();
+                    clearScreen();
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>" + currentquestion + "</h1></div>")
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Times Up!, The Correct Answer Was: " + correctanswer + "</h1></div>")
+                    unanswered++
+                    playnumber++
+                    var windowTimeout = setTimeout(function () {
+                        runGame();
+                    }, 3000);
+                    
+                }
+            }
+            function runGame() {
+                if (playnumber === 2) {
+                    clearScreen();
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Game Over!</h1></div>")
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Number of correct answers: " + correctscore + "</h1></div>")
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Number of incorrect answers: " + incorrectscore + "</h1></div>")
+                    $("main").append("<div class='jumbotron text-center'><h1 cla='display-4'>Number of unanswered: " + unanswered + "</h1></div>")
+                    $("main").append("<div class='jumbotron text-center'><button id='restartbutton' type='button' class='btn btn-lg btn-block btn-primary'>Play Again?</button></div>")
+                    $(document).on('click', '#restartbutton', function () {
+                        playnumber = 0;
+                        correctscore = 0;
+                        incorrectscore = 0;
+                        unanswered = 0;
+                        getGameStart() ;
+                    });
+
+                }
+                else {
+                number = 4;
+                currentquestion = "";
+                currentanswers = [];
+                correctanswer = "";
+                clearScreen();
+                getNewQuestion();
+                run();
+
+                }
+
+            }
+            getGameStart();
+
+            $(document).on('click', '#startgamebutton', function () {
+                runGame()
+
+            });
 
 
 
 
 
 
-            
+
+
 
 
 
