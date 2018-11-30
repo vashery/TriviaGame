@@ -42,7 +42,7 @@
                             playnumber++
                             windowTimeout = setTimeout(function () {
                                 runGame()
-                            }, 3000);
+                            }, 2000);
 
                         }
                         else {
@@ -51,7 +51,7 @@
                             playnumber++
                             var windowTimeout = setTimeout(function () {
                                 runGame()
-                            }, 3000);
+                            }, 2000);
 
                         }
                     });
